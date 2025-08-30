@@ -2,6 +2,8 @@
 
 An implementation of the **RunCloud MCP (Model Context Protocol) Server** that enables AI assistants to manage RunCloud infrastructure through natural language interactions. This server exposes RunCloud's server management, web application deployment, database administration, and backup management capabilities through the MCP protocol.
 
+[Demo video here ](https://drive.google.com/file/d/1amYWwHKvksyt4sINfn5f8fySu_L_YTmR/view?usp=sharing)
+
 ## What This Project Does
 
 RCMCP provides AI assistants with comprehensive RunCloud management tools, allowing you to:
