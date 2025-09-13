@@ -2,8 +2,8 @@
 
 namespace App\Mcp\Tools\Server;
 
-use App\Modules\Server;
 use App\Modules\Formatter\ServerFormatter;
+use App\Modules\Server;
 use Laravel\Mcp\Server\Tool;
 use Laravel\Mcp\Server\Tools\ToolInputSchema;
 use Laravel\Mcp\Server\Tools\ToolResult;
@@ -26,15 +26,23 @@ class ListSystemUsers extends Tool
 
     public function handle(array $arguments): ToolResult
     {
+        // Get RunCloud API token from middleware-extracted container
+        $apiToken = app()->bound('runcloud.api.token') ? app('runcloud.api.token') : null;
+
+        if (! $apiToken) {
+            return ToolResult::error('RunCloud API token is required. Please provide your RunCloud API token in the X-RunCloud-Token header.');
+        }
+
         $id = $arguments['id'];
-        $server = new Server();
+        $server = new Server($apiToken);
         $result = $server->listSystemUsers($id);
-        
-        if (!$result['success']) {
+
+        if (! $result['success']) {
             return ToolResult::error($result['message']);
         }
 
         $output = ServerFormatter::formatSystemUsers($result, $id);
+
         return ToolResult::text($output);
     }
 }

@@ -26,15 +26,23 @@ class ListDatabases extends Tool
 
     public function handle(array $arguments): ToolResult
     {
+        // Get RunCloud API token from middleware-extracted container
+        $apiToken = app()->bound('runcloud.api.token') ? app('runcloud.api.token') : null;
+
+        if (! $apiToken) {
+            return ToolResult::error('RunCloud API token is required. Please provide your RunCloud API token in the X-RunCloud-Token header.');
+        }
+
         $serverId = $arguments['server_id'];
-        $database = new Database();
+        $database = new Database($apiToken);
         $result = $database->listDatabases($serverId);
-        
-        if (!$result['success']) {
+
+        if (! $result['success']) {
             return ToolResult::error($result['message']);
         }
 
         $output = DatabaseFormatter::formatDatabasesList($result);
+
         return ToolResult::text($output);
     }
 }

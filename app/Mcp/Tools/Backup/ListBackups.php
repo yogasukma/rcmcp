@@ -35,17 +35,25 @@ class ListBackups extends Tool
 
     public function handle(array $arguments): ToolResult
     {
+        // Get RunCloud API token from middleware-extracted container
+        $apiToken = app()->bound('runcloud.api.token') ? app('runcloud.api.token') : null;
+
+        if (! $apiToken) {
+            return ToolResult::error('RunCloud API token is required. Please provide your RunCloud API token in the X-RunCloud-Token header.');
+        }
+
         // Filter out empty parameters
-        $params = array_filter($arguments, fn($v) => !empty($v));
-        
-        $backup = new Backup();
+        $params = array_filter($arguments, fn ($v) => ! empty($v));
+
+        $backup = new Backup($apiToken);
         $result = $backup->listBackups($params);
-        
-        if (!$result['success']) {
+
+        if (! $result['success']) {
             return ToolResult::error($result['message']);
         }
 
         $output = BackupFormatter::formatBackupsList($result);
+
         return ToolResult::text($output);
     }
 }

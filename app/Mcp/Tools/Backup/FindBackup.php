@@ -26,15 +26,23 @@ class FindBackup extends Tool
 
     public function handle(array $arguments): ToolResult
     {
+        // Get RunCloud API token from middleware-extracted container
+        $apiToken = app()->bound('runcloud.api.token') ? app('runcloud.api.token') : null;
+
+        if (! $apiToken) {
+            return ToolResult::error('RunCloud API token is required. Please provide your RunCloud API token in the X-RunCloud-Token header.');
+        }
+
         $id = $arguments['id'];
-        $backup = new Backup();
+        $backup = new Backup($apiToken);
         $result = $backup->findBackup($id);
-        
-        if (!$result['success']) {
+
+        if (! $result['success']) {
             return ToolResult::error($result['message']);
         }
 
         $output = BackupFormatter::formatBackupDetails($result);
+
         return ToolResult::text($output);
     }
 }

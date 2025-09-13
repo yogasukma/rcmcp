@@ -6,9 +6,9 @@ class WebApplication
 {
     protected APIRequest $api;
 
-    public function __construct()
+    public function __construct(?string $apiToken = null)
     {
-        $this->api = new APIRequest;
+        $this->api = new APIRequest(null, $apiToken);
     }
 
     public function listWebApplications($serverId)

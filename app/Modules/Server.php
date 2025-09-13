@@ -6,19 +6,30 @@ class Server
 {
     protected APIRequest $api;
 
-    public function __construct()
+    public function __construct(?string $apiToken = null)
     {
-        $this->api = new APIRequest;
+        $this->api = new APIRequest(null, $apiToken);
     }
 
-    public function listServers()
+    /**
+     * List all servers.
+     *
+     * @return array An array of servers.
+     */
+    public function listServers(): array
     {
         $result = $this->api->request('GET', '/servers');
 
         return $result;
     }
 
-    public function findServer($id)
+    /**
+     * Find a server by its ID.
+     *
+     * @param  string  $id  The server ID.
+     * @return array An array containing server info, stats, and hardware info.
+     */
+    public function findServer($id): array
     {
         $info = $this->api->request('GET', '/servers/'.$id);
 
@@ -34,6 +45,12 @@ class Server
         ];
     }
 
+    /**
+     * List all system users for a server.
+     *
+     * @param  string  $id  The server ID.
+     * @return array An array of system users.
+     */
     public function listSystemUsers($id)
     {
         $result = $this->api->request('GET', '/servers/'.$id.'/users');

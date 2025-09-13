@@ -2,8 +2,8 @@
 
 namespace App\Mcp\Tools\WebApplication;
 
-use App\Modules\WebApplication;
 use App\Modules\Formatter\WebApplicationFormatter;
+use App\Modules\WebApplication;
 use Laravel\Mcp\Server\Tool;
 use Laravel\Mcp\Server\Tools\ToolInputSchema;
 use Laravel\Mcp\Server\Tools\ToolResult;
@@ -32,20 +32,28 @@ class CreateWebApplication extends Tool
 
     public function handle(array $arguments): ToolResult
     {
+        // Get RunCloud API token from middleware-extracted container
+        $apiToken = app()->bound('runcloud.api.token') ? app('runcloud.api.token') : null;
+
+        if (! $apiToken) {
+            return ToolResult::error('RunCloud API token is required. Please provide your RunCloud API token in the X-RunCloud-Token header.');
+        }
+
         $serverId = $arguments['server_id'];
         $data = [
             'name' => $arguments['name'],
             'domainName' => $arguments['domain_name'],
         ];
-        
-        $webApp = new WebApplication();
+
+        $webApp = new WebApplication($apiToken);
         $result = $webApp->createWebApplication($serverId, $data);
-        
-        if (!$result['success']) {
+
+        if (! $result['success']) {
             return ToolResult::error($result['message']);
         }
 
         $output = WebApplicationFormatter::formatCreateResult($result);
+
         return ToolResult::text($output);
     }
 }

@@ -11,7 +11,16 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Add CORS middleware globally
+        $middleware->append(\App\Http\Middleware\CorsMiddleware::class);
+
+        // Add MCP authentication middleware alias
+        $middleware->alias([
+            'mcp.auth' => \App\Http\Middleware\McpAuthMiddleware::class,
+            'extract.runcloud.token' => \App\Http\Middleware\ExtractRunCloudToken::class,
+        ]);
+
+        // Note: Redis throttling removed for SQLite compatibility
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
